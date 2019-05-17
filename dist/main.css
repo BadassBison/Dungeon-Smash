@@ -1,0 +1,25 @@
+html, body {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+div {
+    height: 100%;
+    width: 100%;
+    background: url('../images/dungeon.gif') no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    filter: brightness(40%);
+    
+}
+
+canvas {
+    position: absolute;
+    z-index: 5;
+}

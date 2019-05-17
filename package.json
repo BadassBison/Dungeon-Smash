@@ -1,0 +1,19 @@
+{
+  "name": "big_boy_ceo",
+  "version": "1.0.0",
+  "description": "A fun game",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack --watch --mode=development"
+  },
+  "author": "Shawn Scott",
+  "license": "ISC",
+  "devDependencies": {
+    "webpack": "^4.31.0",
+    "webpack-cli": "^3.3.2"
+  },
+  "dependencies": {
+    "lodash": "^4.17.11"
+  }
+}
