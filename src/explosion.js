@@ -3,52 +3,39 @@ export default class Explosion {
     constructor(x, y){
         this.img = new Image();
         this.img.src = "../sprite_sheets/explosion.png";
-        this.sheetWidth = 512;
-        this.sheetHeight = 512;
-        this.rows = 8;
-        this.cols = 8;
+        this.sheetWidth = 780;
+        this.sheetHeight = 910;
+        this.rows = 7;
+        this.cols = 6;
         this.width = this.sheetWidth / this.cols;
         this.height = this.sheetWidth / this.cols;
         this.x = x;
-        this.y = y + 20;
-        this.dirX = dirX;
-        this.dirY = dirY;
-        this.dx = 0;
-        this.dy = 0;
-        this.dist = 0;
-        this.hitbox = {
-            x: 27,
-            y: 25,
-            width: 22,
-            height: 45,
-            radius: 15
-        }
-        this.srcX = 0;
-        this.srcY = 3 * this.height;
-        this.spriteCycle = 0;
+        this.y = y;
         this.currentFrame = 0;
-        this.shot = true;
+        this.yFrame = 0;
+        this.srcX = 0;
+        this.srcY = 0;
+        this.spriteCycle = 0;
+        this.complete = false;
     }
 
     updateSprite() {
-        this.currentFrame = ++this.currentFrame % (this.cols-1)
-        this.srcX = this.currentFrame * this.width;
+        if (this.currentFrame < this.cols - 1) {
+            // console
+            this.currentFrame = ++this.currentFrame;
+            this.srcX = this.currentFrame * this.width;
+        } else {
+            this.yFrame++;
+            this.srcY = this.yFrame * this.height;
+            this.currentFrame = 0;
+            this.srcX = this.currentFrame * this.width;
+        }
+        // if(this.yFrame >= this.rows) this.complete = true
+        if(this.yFrame >= this.rows) this.complete = true;
     }
 
-    move(move) {
-        this.x -= move.x;
-        this.y -= move.y;
-    }
-
-    data(dx, dy, dist){
-        this.shot = false;
-        this.dx = dx;
-        this.dy = dy;
-        this.dist = dist;
-    }
-
-    direction(num){
-        this.srcY = num * this.height
+    spriteCycleReset() {
+        this.spriteCycle = 0;
     }
 
 }

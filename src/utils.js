@@ -1,3 +1,8 @@
+import Sound from './sounds.js';
+import Fireball from './fireball.js';
+import Explosion from './explosion.js';
+
+
 //-------------------------------------------------------------------------------------
 // Refresh the canvas
 export const refresh = (ctx, canvas) => {
@@ -6,8 +11,33 @@ export const refresh = (ctx, canvas) => {
 
 
 //-------------------------------------------------------------------------------------
-// key down movement 
-export const changeDirection = (keyVal, movements, fireballs, c) => {
+// Play sounds
+
+const playSound = sound => {
+    
+    // Remove previous sound nodes
+    let sounds = document.querySelectorAll('.sound');
+    sounds.forEach(el => {
+        el.remove();
+    })
+
+    switch(sound){
+        case "fireball":
+            let shot = new Sound('../sounds/fireballShot.wav');
+            shot.play();
+        case "explosion":
+            let hit = new Sound('../sounds/explosion.wav');
+            hit.play();
+        case "bump":
+            let bump = new Sound('../sounds/bump.flac');
+            bump.play();
+    }
+}
+
+
+//-------------------------------------------------------------------------------------
+// key pressed actions 
+export const changeDirection = (keyVal, movements, fireballs, mousePos, c) => {
     
     switch(keyVal.key){
         case "ArrowUp":
@@ -33,16 +63,19 @@ export const changeDirection = (keyVal, movements, fireballs, c) => {
             if(!(movements.find(move => move === "ArrowRight"))) movements.push("ArrowRight");
             c.changeDirection("move");
             break;
-        // case " ":
-        //     fireballs.push(new Fireball(c.x, c.y, e.x, e.y));
-        //     break;
+
+        case " ":
+        case "Shift":
+            playSound("fireball");
+            fireballs.push(new Fireball(c.x, c.y, mousePos.x, mousePos.y));
+            break;
     }
-    return movements;
+    return fireballs;
 }
 
 
 //-------------------------------------------------------------------------------------
-// Key up to stop moving
+// Key release actions
 export const stopDirection = (keyVal, movements) => {
     switch(keyVal.key){
         case "ArrowUp":
@@ -70,7 +103,7 @@ export const stopDirection = (keyVal, movements) => {
 
 
 //-------------------------------------------------------------------------------------
-// draws the characters
+// Draws the characters
 export const drawCharacters = (characters, spriteCycle, ctx, c) => {
     
     spriteCycle++;
@@ -188,11 +221,7 @@ export const moveComputers = (computers, c) => {
                 computer.sprite.srcY = 2 * computer.sprite.height;
             }
         }
-
-
     })
-
-
 }
 
 
@@ -217,21 +246,25 @@ export const generatePos = (width, height) => {
 
 //-------------------------------------------------------------------------------------
 // Collision detection
-export const detectCollision = (c, characters, fireballs) => {
+export const detectCollision = (c, characters, fireballs, explosions) => {
     
+    // Main character health regeneration
     c.sprite.heal();
+
+    // Main character touches an enemy
     characters.forEach(character => {
         let dx = c.x - character.x;
         let dy = c.y - character.y;
         if (dy === 0) dy += 0.000001;
         let dist = Math.sqrt(dx*dx + dy*dy);
         if (dist < (c.sprite.hitbox.radius + character.sprite.hitbox.radius)) {
+            playSound("bump");
             c.bump(dx/dist * 2, dy/dist * 2)
             c.sprite.hit();
-            console.log(c.sprite.health);
         }
     })
     
+    // Any Enemy touches any other enemy
     let all = characters.concat(c);
     for(let i = 0; i < all.length - 1; i++){
         for(let j = i+1; j < all.length; j++){
@@ -246,6 +279,7 @@ export const detectCollision = (c, characters, fireballs) => {
         }
     }
 
+    // Fireball hits an enemy
     let fireballHits = []
     let skeletonsHit = []
     for(let i = 0; i < fireballs.length; i++){
@@ -256,22 +290,36 @@ export const detectCollision = (c, characters, fireballs) => {
             let dist = Math.sqrt(dx*dx + dy*dy);
 
             if (dist < (fireballs[i].hitbox.radius + characters[j].sprite.hitbox.radius)) {
+                playSound("explosion");
                 fireballHits.push(fireballs[i]);
                 skeletonsHit.push(characters[j]);
+                explosions.push(new Explosion(characters[j].x, characters[j].y))
             }
         }
     }
 
-    
+    // Remove fireball if hit
     fireballHits.forEach(hit => {
         fireballs = fireballs.filter(fireball => hit !== fireball);
     })
 
+    // Remove skeleton if hit
     skeletonsHit.forEach(hit => {
         characters = characters.filter(character => hit !== character);
     })
 
-    return {fireballs: fireballs, characters: characters}
+    // Remove finished explosions
+    // explosions = explosions.filter(
+    //     boom => {
+    //         !(boom.complete)
+    //     });
+
+    // if (explosions.length > 0) console.log("bottom");
+    return {
+        fireballs: fireballs, 
+        characters: characters,
+        explosions: explosions
+    }
 }
 
 
@@ -294,7 +342,6 @@ export const drawFireballs = (fireballs, ctx, canvas) => {
             fireball.width * 1.2, 
             fireball.height * 1.2
         )
-
     })
 
     fireballs = fireballs.filter(fireball => {
@@ -303,10 +350,7 @@ export const drawFireballs = (fireballs, ctx, canvas) => {
         return true
     })
 
-    return {
-        fireballs: fireballs
-    };
-
+    return { fireballs: fireballs };
 }
 
 
@@ -366,7 +410,36 @@ export const moveFireballs = fireballs => {
            (2 <= ratio && fireball.dx >= 0 && fireball.dy >= 0)){ 
             fireball.direction(0);
         } 
+    })
+}
 
+
+//-------------------------------------------------------------------------------------
+// Draw explosions
+export const drawExplosions = (explosions, ctx) => {
+
+    explosions.forEach(boom => {
+        
+        boom.spriteCycle++;
+        if (boom.spriteCycle % 2 === 0) {
+            boom.updateSprite();
+            boom.spriteCycleReset();
+        } 
+        
+        ctx.drawImage(
+            boom.img, 
+            boom.srcX, 
+            boom.srcY, 
+            boom.width, 
+            boom.height, 
+            boom.x, 
+            boom.y, 
+            boom.width * 0.8, 
+            boom.height * 0.8
+        )
     })
 
+    explosions = explosions.filter(boom => !boom.complete);
+
+    return {explosions: explosions}
 }

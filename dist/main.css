@@ -23,3 +23,21 @@ canvas {
     position: absolute;
     z-index: 5;
 }
+
+.mute {
+    position: absolute;
+    left: 10;
+    right: top; 10;
+    z-index: 6;
+}
+
+.sound {
+    position: absolute;
+    left: 10;
+    top: 10;
+    z-index: 6;
+}
+
+.hidden {
+    display: none;
+}

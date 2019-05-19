@@ -21,7 +21,7 @@ export default class Fireball {
             y: 25,
             width: 22,
             height: 45,
-            radius: 15
+            radius: 25
         }
         this.srcX = 0;
         this.srcY = 3 * this.height;
