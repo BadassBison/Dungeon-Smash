@@ -2,7 +2,7 @@ export default class BaldGuy {
 
     constructor() {
         this.img = new Image();
-        this.img.src = '../sprite_sheets/bald_guy.png';
+        this.img.src = 'sprite_sheets/bald_guy.png';
         this.sheetWidth = 576;
         this.sheetHeight = 256;
         this.cols = 9;

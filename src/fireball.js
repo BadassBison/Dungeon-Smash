@@ -2,7 +2,7 @@ export default class Fireball {
     
     constructor(x, y, dirX, dirY){
         this.img = new Image();
-        this.img.src = "../sprite_sheets/fireball.png";
+        this.img.src = "sprite_sheets/fireball.png";
         this.sheetWidth = 512;
         this.sheetHeight = 512;
         this.rows = 8;

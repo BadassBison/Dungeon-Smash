@@ -2,7 +2,7 @@ export default class Skeleton {
 
     constructor() {
         this.img = new Image();
-        this.img.src = '../sprite_sheets/skeleton.png';
+        this.img.src = 'sprite_sheets/skeleton.png';
         this.sheetWidth = 576;
         this.sheetHeight = 256;
         this.cols = 9;

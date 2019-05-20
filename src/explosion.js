@@ -2,7 +2,7 @@ export default class Explosion {
     
     constructor(x, y){
         this.img = new Image();
-        this.img.src = "../sprite_sheets/explosion.png";
+        this.img.src = "sprite_sheets/explosion.png";
         this.sheetWidth = 780;
         this.sheetHeight = 910;
         this.rows = 7;
