@@ -152,7 +152,9 @@ const draw = () => {
         ctx.fillText("You Died", canvas.width * 0.43, canvas.height/2 - 200);
         ctx.fillStyle = "Red";
         ctx.fillText("Your Kills: " + kills, canvas.width * 0.41, canvas.height - 250);
-        
+        kills = 0;
+        skeletonRate = 80;
+        killTracker = 0;
         characters = []
         playBtn.classList.remove("hidden");
     }
