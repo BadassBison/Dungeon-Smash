@@ -23,13 +23,13 @@ const playSound = sound => {
 
     switch(sound){
         case "fireball":
-            let shot = new Sound('../sounds/fireballShot.wav');
+            let shot = new Sound('sounds/fireballShot.wav');
             shot.play();
         case "explosion":
-            let hit = new Sound('../sounds/explosion.wav');
+            let hit = new Sound('sounds/explosion.wav');
             hit.play();
         case "bump":
-            let bump = new Sound('../sounds/bump.flac');
+            let bump = new Sound('sounds/bump.flac');
             bump.play();
     }
 }
