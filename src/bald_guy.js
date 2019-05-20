@@ -36,4 +36,8 @@ export default class BaldGuy {
         if (this.health > 0 && this.health < 100) this.health += 0.03;
     }
 
+    fullHealth() {
+        this.health = 100;
+    }
+
 }

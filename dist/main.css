@@ -7,7 +7,7 @@ html, body {
     overflow: hidden;
 }
 
-div {
+#background {
     height: 100%;
     width: 100%;
     background: url('../images/dungeon.gif') no-repeat center center fixed;
@@ -24,20 +24,84 @@ canvas {
     z-index: 5;
 }
 
-.mute {
+#mute {
     position: absolute;
-    left: 10;
-    right: top; 10;
-    z-index: 6;
+    color: white;
+    font-size: 2em;
+    margin: 15px 15px;
+    z-index: 16;
 }
 
-.sound {
+#mute:hover {
+    cursor: pointer;
+}
+
+#volume {
     position: absolute;
-    left: 10;
-    top: 10;
-    z-index: 6;
+    color: white;
+    font-size: 2em;
+    margin: 15px 15px;
+    z-index: 16;
+}
+
+#volume:hover {
+    cursor: pointer;
 }
 
 .hidden {
     display: none;
+    margin: -50px;
+}
+
+#start {
+    position: absolute;
+    width: 200px;
+    color: white;
+    font-size: 50px;
+    text-align: center;
+    margin: 300px 40%;
+    padding: 50px;
+    outline: 25px groove blue;
+    z-index: 8;
+}
+
+#start:hover {
+    background: rgba(80, 80, 80, 0.5)
+}
+
+#controls-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around; 
+    align-items: flex-end; 
+    height: 700px;
+    width: 30%;
+    position: absolute;
+    z-index: 13;
+}
+
+.top {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 60%;
+    box-sizing: border-box;
+    color: white;
+    font-size: 2em;
+    padding-right: 40px;
+}
+
+.bottom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 60%;
+    box-sizing: border-box;
+    color: white;
+    font-size: 2em;
+}
+
+.mouse img {
+    max-width: 100%;
+    max-height: 100%;
 }

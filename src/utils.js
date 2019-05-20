@@ -1,4 +1,5 @@
 import Sound from './sounds.js';
+import Character from './character.js';
 import Fireball from './fireball.js';
 import Explosion from './explosion.js';
 
@@ -12,7 +13,6 @@ export const refresh = (ctx, canvas) => {
 
 //-------------------------------------------------------------------------------------
 // Play sounds
-
 const playSound = sound => {
     
     // Remove previous sound nodes
@@ -36,8 +36,69 @@ const playSound = sound => {
 
 
 //-------------------------------------------------------------------------------------
+// Sound toggle
+export const toggleSound = (e, soundVolume) => {
+    
+    let mute = document.getElementById("mute");
+    let volume = document.getElementById("volume");
+
+    if(e.target.id === "mute"){
+        mute.classList.add("hidden");
+        volume.classList.remove("hidden");
+        soundVolume = "on";
+    } else {
+        volume.classList.add("hidden");
+        mute.classList.remove("hidden");
+        soundVolume = "mute"
+    }
+    return soundVolume;
+}
+
+
+//-------------------------------------------------------------------------------------
+// Start game
+export const startGame = (e, c) => {
+    
+    let start = document.getElementById("start").setAttribute("class", "hidden");
+    let controls = document.querySelectorAll(".controls");
+    controls.forEach(node => node.remove());
+    c.sprite.fullHealth();
+    return true;
+}
+
+          
+//-------------------------------------------------------------------------------------
+// Click Shooting
+export const shoot = (fireballs, e, c, soundVolume) => {
+    if (fireballs.length < 5){
+        if(soundVolume === "on") playSound("fireball");
+        fireballs.push(new Fireball(c.x, c.y, e.x, e.y));
+    }
+    return fireballs;
+}
+
+
+//-------------------------------------------------------------------------------------
+// Kills counter
+export const displaySkeletonDeaths = (kills, ctx) => {
+    ctx.font="20px Georgia"
+    ctx.fillStyle = "white";
+	ctx.fillText("Kills: " + kills, innerWidth - 400, 36);
+}
+
+
+//-------------------------------------------------------------------------------------
+// Health Bar
+export const displayHealthBar = (ctx, c) => {
+    ctx.lineWidth = 6;
+    ctx.strokeRect(innerWidth - 302, 18, 254, 24);
+    ctx.fillStyle = "#FF0000";
+    ctx.fillRect(innerWidth - 299, 21, c.sprite.health * 2.5, 18);
+}
+
+//-------------------------------------------------------------------------------------
 // key pressed actions 
-export const changeDirection = (keyVal, movements, fireballs, mousePos, c) => {
+export const changeDirection = (keyVal, movements, fireballs, mousePos, c, soundVolume) => {
     
     switch(keyVal.key){
         case "ArrowUp":
@@ -66,8 +127,10 @@ export const changeDirection = (keyVal, movements, fireballs, mousePos, c) => {
 
         case " ":
         case "Shift":
-            playSound("fireball");
-            fireballs.push(new Fireball(c.x, c.y, mousePos.x, mousePos.y));
+            if (fireballs.length < 5) {
+                if (soundVolume === "on") playSound("fireball");
+                fireballs.push(new Fireball(c.x, c.y, mousePos.x, mousePos.y));
+            }
             break;
     }
     return fireballs;
@@ -226,6 +289,37 @@ export const moveComputers = (computers, c) => {
 
 
 //-------------------------------------------------------------------------------------
+// Start screen Computer movement
+export const startComputers = (computers, mousePos) => {
+    
+    computers.forEach(computer => {
+        let dx = computer.x - mousePos.x;
+        let dy = computer.y - mousePos.y;
+        if (dy === 0) dy += 0.000001;
+        let dist = Math.sqrt( dx*dx + dy*dy);
+        computer.move({ x: (dx/dist), y: (dy/dist) })
+        if(dx/dy > 1){
+            if(dx > 0) {
+                computer.changeDirection("left")
+                computer.sprite.srcY = 1 * computer.sprite.height;
+            } else {
+                computer.changeDirection("right")
+                computer.sprite.srcY = 3 * computer.sprite.height;
+            }
+        } else {
+            if(dy > 0) {
+                computer.changeDirection("up")
+                computer.sprite.srcY = 0 * computer.sprite.height;
+            } else {
+                computer.changeDirection("down")
+                computer.sprite.srcY = 2 * computer.sprite.height;
+            }
+        }
+    })
+}
+
+
+//-------------------------------------------------------------------------------------
 // Random computer placement
 export const generatePos = (width, height) => {
     let x = Math.floor(Math.random() * width);
@@ -246,7 +340,7 @@ export const generatePos = (width, height) => {
 
 //-------------------------------------------------------------------------------------
 // Collision detection
-export const detectCollision = (c, characters, fireballs, explosions) => {
+export const detectCollision = (c, characters, fireballs, explosions, kills, soundVolume) => {
     
     // Main character health regeneration
     c.sprite.heal();
@@ -258,8 +352,8 @@ export const detectCollision = (c, characters, fireballs, explosions) => {
         if (dy === 0) dy += 0.000001;
         let dist = Math.sqrt(dx*dx + dy*dy);
         if (dist < (c.sprite.hitbox.radius + character.sprite.hitbox.radius)) {
-            playSound("bump");
             c.bump(dx/dist * 2, dy/dist * 2)
+            if (soundVolume == "on") playSound("bump");
             c.sprite.hit();
         }
     })
@@ -290,7 +384,9 @@ export const detectCollision = (c, characters, fireballs, explosions) => {
             let dist = Math.sqrt(dx*dx + dy*dy);
 
             if (dist < (fireballs[i].hitbox.radius + characters[j].sprite.hitbox.radius)) {
-                playSound("explosion");
+        
+                if (soundVolume === "on") playSound("explosion");
+                kills++;
                 fireballHits.push(fireballs[i]);
                 skeletonsHit.push(characters[j]);
                 explosions.push(new Explosion(characters[j].x, characters[j].y))
@@ -308,17 +404,11 @@ export const detectCollision = (c, characters, fireballs, explosions) => {
         characters = characters.filter(character => hit !== character);
     })
 
-    // Remove finished explosions
-    // explosions = explosions.filter(
-    //     boom => {
-    //         !(boom.complete)
-    //     });
-
-    // if (explosions.length > 0) console.log("bottom");
     return {
         fireballs: fireballs, 
         characters: characters,
-        explosions: explosions
+        explosions: explosions,
+        kills: kills
     }
 }
 
@@ -442,4 +532,10 @@ export const drawExplosions = (explosions, ctx) => {
     explosions = explosions.filter(boom => !boom.complete);
 
     return {explosions: explosions}
+}
+
+//-------------------------------------------------------------------------------------
+// Game Over
+export const gameOver = c => {
+    return (c.sprite.health !== 0)
 }

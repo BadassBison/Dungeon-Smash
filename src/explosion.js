@@ -20,6 +20,7 @@ export default class Explosion {
     }
 
     updateSprite() {
+        
         if (this.currentFrame < this.cols - 1) {
             // console
             this.currentFrame = ++this.currentFrame;
@@ -30,7 +31,7 @@ export default class Explosion {
             this.currentFrame = 0;
             this.srcX = this.currentFrame * this.width;
         }
-        // if(this.yFrame >= this.rows) this.complete = true
+      
         if(this.yFrame >= this.rows) this.complete = true;
     }
 
